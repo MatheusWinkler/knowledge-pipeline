@@ -1,0 +1,14 @@
+# --- Secrets (NEVER UPLOAD THESE) ---
+config/.env
+.env
+
+# --- Python Cache ---
+__pycache__/
+*.pyc
+
+# --- Logs ---
+pipeline.log
+
+# --- OS Junk ---
+.DS_Store
+Thumbs.db

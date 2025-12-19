@@ -1,0 +1,16 @@
+# --- Core Application ---
+requests>=2.31.0      # For Open WebUI API communication
+pyyaml>=6.0           # For parsing settings.yaml
+python-dotenv>=1.0.0  # For loading secrets from .env
+
+# --- AI & Transcription ---
+openai-whisper        # The core transcription engine
+# Note: You likely need torch installed separately if using GPU, 
+# but whisper usually pulls a CPU version by default.
+
+# --- Data Processing ---
+dateparser>=1.1.8     # Robust date extraction from text
+python-frontmatter>=1.0.0 # Safe handling of Markdown metadata
+
+# --- Utilities ---
+colorama              # (Optional) For colored terminal logs

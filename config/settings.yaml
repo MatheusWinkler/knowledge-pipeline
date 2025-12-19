@@ -1,0 +1,86 @@
+# ==============================================================================
+# KNOWLEDGE PIPELINE: MASTER CONFIGURATION
+# ==============================================================================
+# This file controls the logic, prompts, and routing of the pipeline.
+# It allows the code to remain generic while the "Personality" lives here.
+# ==============================================================================
+
+# --- Application Meta ---
+app_name: "Knowledge Pipeline"
+version: "2.2.0"
+
+# --- AI Hardware & Model Settings ---
+# model_size: Controls Whisper accuracy vs speed.
+# Options: [tiny, base, small, medium, large, large-v2, large-v3]
+# Recommendation: 'large' for best accuracy if VRAM > 8GB.
+whisper_model_size: "medium"
+
+# llm_model: The specific model tag in Open WebUI for analysis.
+# CRITICAL: Must match a model ID currently loaded in your Open WebUI instance.
+llm_model_id: "llama3.1:8b"
+
+# --- Timeout Thresholds (Seconds) ---
+# timeouts: Prevent the pipeline from hanging on slow operations.
+timeouts:
+  llm_analysis: 300      # 5 minutes (for large models/Cold Start)
+  file_stability: 1.0    # Time to wait for file size to settle
+  http_connect: 5        # Time to wait for server connection
+  http_read: 300         # Time to wait for server response
+
+# --- File System Paths ---
+# Use absolute paths or standard Windows notation (e.g., "D:\\Folder").
+# NOTE: 'base_path' is a variable you can use to shorten other paths.
+paths:
+  base: "C:\\"
+  input_folder: "_INPUT_AUDIO"
+  archive_folder: "_ARCHIVE_AUDIO"
+  input_text_folder: "_INPUT_TEXT"
+  knowledge_folder: "Knowledge"
+
+# --- Content Routing & Analysis Rules ---
+# Define how different types of content are detected and processed.
+# Keys (e.g., 'dream_report') are used internally.
+# 'type_name' is what appears in the Markdown frontmatter.
+# Example:
+# dream_report:
+#    type_name: "Dream Report"
+#     # Logic: If these keywords appear in the first 100 words, it's this content type.
+#     detection_keywords: ["dream", "traum", "geträumt", "dreamed", "träume"]
+#     # Output: Subfolder inside the Knowledge directory.
+#     target_subfolder: "Dream Journal"
+#     # Sync: Open WebUI Collection ID (UUID).
+#     collection_id: "7e9d0e83-0f8f-80ed-aa3b-4a8edd5ebd04"
+#     # Feature: Enable LLM Analysis?
+#     enable_analysis: true
+#     # AI Persona:
+#     system_prompt: "You are an expert dream analyst specializing in the Five Star Method."     
+#     user_prompt: "Analyze this dream report using the Five Star Method:\n\n"
+
+content_types:
+
+  Default:
+    type_name: New Type
+    detection_keywords: []
+    target_subfolder: New
+    enable_analysis: false
+    system_prompt: ''
+    user_prompt: ''
+    collection_id: ''
+    is_default: true
+special_collections:
+  focus_mode_id: ""
+
+# --- Metadata Extraction Config ---
+metadata_prompt:
+  system: |-
+    You are a metadata extraction API. You strictly output valid JSON only. 
+    No markdown, no preambles. 
+    CRITICAL: If the input text is German, the 'title', 'emotions', and 'summary' values MUST be in German. 
+    If the input text is English, they MUST be in English.
+  user: |-
+    Analyze the following text and extract these fields into a JSON object:
+    1. "title": A short, catchy title (max 6 words) in the SAME language as the text.
+    2. "language": The primary language of the text, strictly "en" or "de".
+    3. "emotions": A list of distinct emotions detected (max 5) in the SAME language as the text.
+    4. "characters": A list of specific people mentioned (exclude the speaker/I).
+    5. "summary": A concise summary (max 2 sentences) in the SAME language as the text. MUST be a single, plain string value.
