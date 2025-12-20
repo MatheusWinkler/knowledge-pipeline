@@ -9,7 +9,7 @@
 import os
 import yaml
 import logging
-from typing import Dict, Any, Optional
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
@@ -28,6 +28,7 @@ class PipelineConfig:
     metadata_prompt: Dict[str, str]
     api_key: str
     api_url: str
+    tag_triggers: List[str]
 
 class ConfigManager:
     def __init__(self, config_path: str = "config/settings.yaml", env_path: str = "config/.env"):
@@ -87,8 +88,11 @@ class ConfigManager:
             # Look for new key 'input_text_folder', fallback to old 'batch_sync_folder'
             "batch": resolve("input_text_folder", fallback_key="batch_sync_folder")
         }
+        # 5. Load Tag Triggers with Fallback
+        tag_triggers = yaml_data.get("tag_triggers", ["Tag", "Tags", "Stichwort", "Stichworte", "Hashtag", "Hashtags"]) # <--- LOAD WITH DEFAULT
+        tag_search_window = yaml_data.get("tag_search_window", 400) # <--- LOAD WITH DEFAULT
 
-        # 4. Construct Object
+        # 6. Construct Object
         return PipelineConfig(
             app_name=yaml_data.get("app_name", "Knowledge Pipeline"),
             whisper_model_size=yaml_data.get("whisper_model_size", "base"),
@@ -100,5 +104,6 @@ class ConfigManager:
             auto_tags=yaml_data.get("auto_tags", {}),
             metadata_prompt=yaml_data.get("metadata_prompt", {}),
             api_key=api_key,
-            api_url=api_url
+            api_url=api_url,
+            tag_triggers=tag_triggers
         )

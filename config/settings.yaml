@@ -7,7 +7,7 @@
 
 # --- Application Meta ---
 app_name: "Knowledge Pipeline"
-version: "2.2.0"
+version: "1.1.0"
 
 # --- AI Hardware & Model Settings ---
 # model_size: Controls Whisper accuracy vs speed.
@@ -84,3 +84,12 @@ metadata_prompt:
     3. "emotions": A list of distinct emotions detected (max 5) in the SAME language as the text.
     4. "characters": A list of specific people mentioned (exclude the speaker/I).
     5. "summary": A concise summary (max 2 sentences) in the SAME language as the text. MUST be a single, plain string value.
+
+# --- Global Tag Detection ---
+# Keywords that trigger tag extraction at the end of a file (case-insensitive).
+# The pipeline looks for these words followed by a colon or space.
+tag_triggers:
+- Stichwort
+- Stichworte
+- Hashtag
+tag_search_window: 400

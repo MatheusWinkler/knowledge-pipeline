@@ -190,7 +190,7 @@ class SettingsApp:
         paths_info = "Base Path: " + str(self.get_comment(["paths", "base"]) or "Root folder for operations.") + "\n"
         add_section("FOLDERS & PATHS", paths_info)
 
-        # 3. Content Types (Updated Example)
+        # 3. Content Types
         ct_info = (
             "Content Types define how files are processed based on keywords.\n"
             "You can add new types, edit prompts, and set a 'Default' type for fallback.\n\n"
@@ -202,17 +202,20 @@ class SettingsApp:
         )
         add_section("CONTENT TYPES", ct_info)
 
-        # 4. AI Models (Updated Warning)
+        # 4. AI Models (Updated with Tag Fallbacks)
         ai_info = ""
         ai_info += f"Whisper: {self.get_comment(['whisper_model_size']) or 'Size of audio model'}\n"
         ai_info += f"LLM ID: {self.get_comment(['llm_model_id']) or 'Model tag from Open WebUI'}\n\n"
+        ai_info += "TAG DETECTION FALLBACKS:\n"
+        ai_info += "  * If keywords are empty -> Defaults to ['Tag', 'Tags']\n"
+        ai_info += "  * If search window is empty/invalid -> Defaults to 400 chars\n\n"
         
         txt.insert(tk.END, "AI MODELS\n", "header")
         txt.insert(tk.END, "---------\n")
         txt.insert(tk.END, ai_info)
         txt.insert(tk.END, "CRITICAL WARNING: The fields of the JSON object (title, language, etc.) are fixed in the application code. DO NOT change the keys in the metadata prompts, only the instructions for how to fill them.\n\n", "warning")
 
-        # 5. System (Updated Location)
+        # 5. System
         sys_desc = self.get_comment(['timeouts']) or "Prevent the pipeline from hanging on slow operations."
         sys_info = f"Description: {sys_desc}\n\n"
         sys_info += f"Analysis Timeout: {self.get_comment(['timeouts', 'llm_analysis']) or 'Seconds to wait'}\n"
@@ -470,7 +473,7 @@ class SettingsApp:
             self.refresh_type_list()
 
     # =========================================================================
-    # 5. AI MODELS
+    # 5. AI MODELS (UPDATED: Added Tag Detection Here)
     # =========================================================================
     def build_ai_tab(self):
         self.ai_fields = []
@@ -484,6 +487,35 @@ class SettingsApp:
         self.create_simple_row(frame_models, "LLM Model ID:", "llm_model_id", 
                                self.get_val(["llm_model_id"]), store_list=self.ai_fields)
 
+        # --- Global Tag Detection (Moved from System Tab) ---
+        frame_tags = ttk.LabelFrame(self.tab_ai, text="Global Tag Detection")
+        frame_tags.pack(fill=tk.X, padx=10, pady=10)
+        
+        # Keywords Row
+        ttk.Label(frame_tags, text="Trigger Keywords (comma separated):").pack(anchor=tk.W, padx=5, pady=(5,0))
+        
+        current_tags = self.get_val(["tag_triggers"], ["Tag", "Tags", "Stichwort"])
+        if isinstance(current_tags, list):
+            tags_str = ", ".join(current_tags)
+        else:
+            tags_str = str(current_tags)
+            
+        self.tag_trigger_var = tk.StringVar(value=tags_str)
+        ttk.Entry(frame_tags, textvariable=self.tag_trigger_var).pack(fill=tk.X, padx=5, pady=5)
+
+        # Window Size Row
+        frame_win = ttk.Frame(frame_tags)
+        frame_win.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Label(frame_win, text="Search Window (Last N characters):").pack(side=tk.LEFT)
+        
+        curr_win = self.get_val(["tag_search_window"], 400)
+        self.tag_window_var = tk.StringVar(value=str(curr_win))
+        
+        ttk.Entry(frame_win, textvariable=self.tag_window_var, width=10).pack(side=tk.LEFT, padx=10)
+        ttk.Label(frame_win, text="(Increase if your spoken tags are often cut off)").pack(side=tk.LEFT, padx=5)
+
+        # --- Metadata Prompts ---
         frame_meta = ttk.LabelFrame(self.tab_ai, text="Metadata Extraction Prompts")
         frame_meta.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -502,6 +534,8 @@ class SettingsApp:
     # =========================================================================
     def build_system_tab(self):
         self.system_fields = []
+        
+        # --- Timeouts ---
         frame_time = ttk.LabelFrame(self.tab_system, text="Timeouts (Seconds)")
         frame_time.pack(fill=tk.X, padx=10, pady=10)
 
@@ -571,6 +605,17 @@ class SettingsApp:
 
             self.set_val(["special_collections", "focus_mode_id"], self.focus_mode_var.get())
             self.data['content_types'] = self.content_types_dict
+            
+            # --- Save Tag Settings ---
+            raw_tags = self.tag_trigger_var.get()
+            tag_list = [t.strip() for t in raw_tags.split(',') if t.strip()]
+            self.data['tag_triggers'] = tag_list
+            
+            try:
+                win_val = int(self.tag_window_var.get())
+            except ValueError:
+                win_val = 400
+            self.data['tag_search_window'] = win_val
 
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
                 self.yaml.dump(self.data, f)

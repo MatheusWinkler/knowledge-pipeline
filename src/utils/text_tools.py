@@ -39,14 +39,36 @@ class TextProcessor:
     def _extract_and_remove_spoken_tags(self, text: str) -> Tuple[List[str], str]:
         if not text: return [], ""
         
-        # Look at the end of the text
-        search_window = text[-400:] if len(text) > 400 else text
+        # --- 1. CONFIGURABLE SEARCH WINDOW ---
+        # Get window size from config, default to 400 if missing or invalid
+        window_size = getattr(self.config, 'tag_search_window', 400)
+        if not isinstance(window_size, int) or window_size < 10:
+            window_size = 400
+
+        # Look at the end of the text based on the configured window
+        search_window = text[-window_size:] if len(text) > window_size else text
         
-        # EXTENDED REGEX:
-        # 1. Keywords: Tag, Tags, Stichwort, Stichworte, Hashtag, Hashtags (Case Insensitive)
-        # 2. Separators: Colon, Space, Dot, Comma
-        # 3. Symbol: Literal '#' (Matches start of "#tag1", "# tag2", etc.)
-        pattern = r'(?i)(?:\b(?:Tag|Tags|Stichwort|Stichworte|Hashtag|Hashtags)\b[:\s\.,]+|[#])(.*)$'
+        # --- 2. DYNAMIC KEYWORDS ---
+        # Get triggers from config, with a runtime safety fallback
+        triggers = getattr(self.config, 'tag_triggers', [])
+        if not triggers: 
+            triggers = ["Tag", "Tags"] 
+        
+        # Escape keywords to prevent regex injection (e.g. if user adds "C++")
+        joined_triggers = "|".join([re.escape(t) for t in triggers])
+        
+        # --- 3. BUILD REGEX ---
+        # (?i)          -> Case insensitive
+        # (?:           -> Non-capturing group for the trigger logic
+        #   \b          -> Word boundary
+        #   (?:...)     -> Group for the user's dynamic list
+        #   \b          -> Word boundary
+        #   [:\s\.,]+   -> Followed by colon, space, dot, or comma
+        #   |           -> OR
+        #   [#]         -> The literal '#' symbol (hardcoded common shorthand)
+        # )
+        # (.*)$         -> Capture everything else until end of string (Group 1)
+        pattern = fr'(?i)(?:\b(?:{joined_triggers})\b[:\s\.,]+|[#])(.*)$'
         
         match = re.search(pattern, search_window)
         
@@ -56,7 +78,7 @@ class TextProcessor:
         if match:
             # Group 1 contains the text AFTER the trigger (e.g. "tag1, #tag2")
             raw_tag_string = match.group(1).strip()
-            # Remove trailing punctuation
+            # Remove trailing punctuation (dots/exclamations at very end of file)
             raw_tag_string = re.sub(r'[\.\!\?]+$', '', raw_tag_string)
             
             if raw_tag_string:
@@ -69,7 +91,7 @@ class TextProcessor:
                     clean_w = re.sub(r'[^\w\-]', '', w)
                     if clean_w: spoken_tags.append(clean_w)
             
-            # Remove from text
+            # Remove the detected tag section from the original text
             match_start_relative = search_window.find(match.group(0))
             if match_start_relative != -1:
                 cut_point = (len(text) - len(search_window)) + match_start_relative
